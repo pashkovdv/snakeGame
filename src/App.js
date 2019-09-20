@@ -44,7 +44,7 @@ const initialState = {
   ],
   speed: 500,
   intervalId: undefined,
-  direction: "RIGHT",
+  arrDirection: ["RIGHT"],
 };
 
 class App extends Component {
@@ -68,22 +68,33 @@ class App extends Component {
   }
 
   onKeyDown = (e) => {
+    
+    let arrDirection = this.state.arrDirection.slice();
+    let direction = undefined;
+
     e = e || window.event;
     switch (e.keyCode) {
       case 38:
-        this.setState({direction: 'UP'});
+          direction = 'UP';
         break;
       case 40:
-        this.setState({direction: 'DOWN'});
+          direction = 'DOWN';
         break;
       case 37:
-        this.setState({direction: 'LEFT'});
+          direction = 'LEFT';
         break;
       case 39:
-        this.setState({direction: 'RIGHT'});
+        direction = 'RIGHT';
         break;
       default:
         break;
+    }
+    
+    if (direction){
+      if (direction != arrDirection[arrDirection.length-1]){
+        arrDirection.push(direction);
+        this.setState({arrDirection: arrDirection});
+      }
     }
   }
 
@@ -97,7 +108,15 @@ class App extends Component {
     let tSnake = [...this.state.snakeArray];
     let head = tSnake[tSnake.length - 1];
 
-    switch (this.state.direction) {
+    let arrDirection = this.state.arrDirection.slice();
+    if (arrDirection.length > 1){
+      arrDirection.shift();
+      this.setState({
+        arrDirection: arrDirection,
+      })
+    }
+
+    switch (arrDirection[0]) {
       case 'RIGHT':
         head = [head[0] + 2, head[1]];
         break;
@@ -118,7 +137,7 @@ class App extends Component {
     tSnake.shift();
 
     this.setState({
-      snakeArray: tSnake
+      snakeArray: tSnake,
     })
   }
 
