@@ -11,6 +11,7 @@
   height: 2%;
   background-color: blue;
   border: 1px solid lightblue;
+  z-index: -1;
 }
 
 .apple{
@@ -20,4 +21,13 @@
   background-color: lightgreen;
   border: 1px solid green;
   border-radius: 50%;
+  z-index: -2;
+}
+
+.gameover{
+  width: '100%';
+  text-align: center;
+  color: red;
+  font-family: fantasy;
+  font-size: 100px;
 }
