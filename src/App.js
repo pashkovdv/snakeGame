@@ -58,11 +58,11 @@ class App extends Component {
   }
 
   onKeyDown = (e) => {
-    
+    // запоминаем сразу несколько нажатий в новом направлении, чтобы потом их исполнять по-очереди на каждом новом шаге.
+
     let arrDirection = this.state.arrDirection.slice();
     let direction = undefined;
 
-    e = e || window.event;
     switch (e.keyCode) {
       case 13:
       case 32:
@@ -87,7 +87,13 @@ class App extends Component {
         break;
     }
     
-    if ( direction && direction !== arrDirection[arrDirection.length-1]){ // если нажатие нового направления
+    const lastDirection = arrDirection[arrDirection.length-1];
+    const isNewWay = direction !== lastDirection;
+    let isOrtogonal = (direction === 'UP' && lastDirection !== 'DOWN');
+    isOrtogonal |= (direction === 'DOWN' && lastDirection !== 'UP')
+    isOrtogonal |= (direction === 'LEFT' && lastDirection !== 'RIGHT')
+    isOrtogonal |= (direction === 'RIGHT' && lastDirection !== 'LEFT')
+    if ( direction && isNewWay && isOrtogonal ){ // если нажатие нового ортогонального направления
       arrDirection.push(direction);
       this.setState({arrDirection: arrDirection});
     }
@@ -100,8 +106,8 @@ class App extends Component {
   }
 
   moveSnake = () => {
-    let tSnake = [...this.state.snakeArray];
-    let head = tSnake[tSnake.length - 1];
+    const tmpSnake = [...this.state.snakeArray];
+    let head = tmpSnake[tmpSnake.length - 1];
 
     let arrDirection = this.state.arrDirection.slice();
     if (arrDirection.length > 1){ // если в буфере много нажатий, то возьмем следующее
@@ -136,7 +142,7 @@ class App extends Component {
     }
     
     // если врезались в себя
-    tSnake.forEach( (dot,i) => {
+    tmpSnake.forEach( (dot,i) => {
       if ( i === 0 ) return;
       if (head[0] === dot[0] && head[1] === dot[1]) {
         this.onGameOver();
@@ -150,14 +156,14 @@ class App extends Component {
       xyApple = getNewApple();
       this.speedUp();
     } else { // не съели
-      tSnake.shift();
+      tmpSnake.shift();
     }
 
-    tSnake.push(head);
+    tmpSnake.push(head);
     
     this.setState({
       xyApple: xyApple,
-      snakeArray: tSnake,
+      snakeArray: tmpSnake,
     })
   }
 
@@ -175,11 +181,11 @@ class App extends Component {
 
   onGameOver() {
     clearInterval(this.state.intervalId);
-    this.setState( _state => { return {
+    this.setState( _state => ({
       gameIsOn: false,
       showGameOver: true,
       lastResult: _state.snakeArray.length - initialState.snakeArray.length,
-    }});
+    }));
   }
 
   startGame = e => {
